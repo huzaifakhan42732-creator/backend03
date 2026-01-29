@@ -1,13 +1,8 @@
-import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 dotenv.config();
-
-const app = express();
-
-// Middleware
-app.use(express.json());
 
 const startServer = async () => {
   try {
@@ -27,8 +22,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-// Test Route
-app.get("/", (req, res) => {
-  res.send("Backend is running ✅");
-});
