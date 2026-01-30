@@ -52,6 +52,7 @@ refreshToken: {
     timestamps:true
 }
 )
+//just some random 
 userSchema.pre("save", async function() {
     if (this.isModified("password")) {
         this.password = await bcrypt.hash(this.password, 10);
