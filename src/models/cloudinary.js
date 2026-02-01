@@ -38,7 +38,7 @@ const uploadToCloudinary = async (localFilePath) => {
       unique_filename: false,
     });
 
-    console.log("✅ File uploaded successfully:", result.secure_url);
+    // console.log("✅ File uploaded successfully:", result.secure_url);
 
     // Delete local file safely
     if (fs.existsSync(localFilePath)) {
