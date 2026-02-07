@@ -4,6 +4,24 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { uploadToCloudinary } from "../models/cloudinary.js";
 
+const generateAccessTokenAndRefreshToken = async (userId) => {
+try{
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
+  return { accessToken, refreshToken };
+}
+catch(error){
+throw new ApiError(500, "Something went wrong while generating tokens")
+}}
+
 const registerUser = asyncHandler(async (req, res) => {
   // 1️⃣ Get data
   const { username, email, password, fullname } = req.body;
@@ -86,32 +104,53 @@ $or: [{ email }, { username: email }]
     throw new ApiError(401, "Invalid password");
   }
 
-  const accessToken = user.generateAccessToken();
-  const refreshToken = user.generateRefreshToken();
+  // 3️⃣ Generate tokens
+  const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
-  // Update user with refresh token
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true
+  };
+
+  return res.status(200).cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: loggedInUser,
+          accessToken,
+          refreshToken
+        },
+        "User logged in successfully"
+      )
+    );
+const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
-    user._id,
+    req.user._id,
     {
-      refreshToken: refreshToken
+      $unset: {
+        refreshToken: 1
+      }
     },
-    { new: true }
+    {
+      new: true
+    }
   );
 
-  // Send response with cookies
-  return res.status(200).cookie("accessToken", accessToken, {
+  const options = {
     httpOnly: true,
-    secure: true,
-    maxAge: 24 * 60 * 60 * 1000 // One day in milliseconds
-  }).cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000 // One week in milliseconds
-  }).json(
-    new ApiResponse(200, { user, accessToken, refreshToken }, "User logged in successfully")
-  );
+    secure: true
+  };
+
+  return res.status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
-
-
-
-export { registerUser, LoginUser };
+});
+export { registerUser, LoginUser, logoutUser };
