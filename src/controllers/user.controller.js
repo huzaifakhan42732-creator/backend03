@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/apiError.js";
+import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { uploadToCloudinary } from "../models/cloudinary.js";
@@ -129,7 +129,7 @@ $or: [{ email }, { username: email }]
         "User logged in successfully"
       )
     );
-const logoutUser = asyncHandler(async (req, res) => {
+const LogoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -153,4 +153,4 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 });
-export { registerUser, LoginUser, logoutUser };
+export { registerUser, LoginUser, LogoutUser };
