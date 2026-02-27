@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config(); // MUST BE FIRST
+dotenv.config(); // MUST BE FIRST awiiiii
 
 import connectDB from "./db/mongoConnect.js";
 import { app } from "./app.js";

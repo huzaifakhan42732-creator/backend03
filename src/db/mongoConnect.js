@@ -13,7 +13,7 @@ export const connectDB = async () => {
 
     console.log(`✅ MongoDB connected: ${connectionInstance.connection.host}/${DB_NAME}`);
   } catch (error) {
-    console.error("❌ Error connecting to MongoDB:", error);
+    console.error("❌ Error connecting to MongoDB  okay:", error);
     process.exit(1);
   }
 };
@@ -21,7 +21,7 @@ export const connectDB = async () => {
 export default connectDB;
 
 // import mongoose from "mongoose";
-// import { DB_NAME } from "../constant.js";
+// import { DB_NAME } from "../constant.js";wefw
 
 
 // export const connectDB = async () => {
